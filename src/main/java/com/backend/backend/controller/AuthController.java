@@ -11,7 +11,6 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.backend.backend.model.Club;
 import com.backend.backend.model.User;
 import com.backend.backend.service.AuthService;
 
@@ -53,13 +52,10 @@ public class AuthController {
         return authService.login(login.getEmail(), login.getPassword(), response);
     }
 
-
     public static class Token {
         private String token;
     
-        // Default constructor is required for deserialization
         public Token() {
-            // Default constructor
             
         }
     
@@ -76,7 +72,6 @@ public class AuthController {
         }
     }
     
-
     @PostMapping("/verify-token")
     public ResponseEntity<?> verifyToken(@RequestBody Token token) {
         return authService.verifyToken(token.getToken());
@@ -95,10 +90,5 @@ public class AuthController {
     @PostMapping("/register-user")
     public ResponseEntity<?> registerUser(@RequestBody User user) {
         return authService.registerUser(user);
-    }
-
-    @PostMapping("/register-club")
-    public ResponseEntity<?> registerClub(@RequestBody Club club) {
-        return authService.registerClub(club);
     }
 }

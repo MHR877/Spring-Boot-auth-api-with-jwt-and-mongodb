@@ -1,7 +1,6 @@
 package com.backend.backend.controller;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 import com.backend.backend.model.Admin;
 import com.backend.backend.service.AdminService;
@@ -13,7 +12,6 @@ import java.util.List;
 public class AdminController {
     @Autowired
     private AdminService adminService;
-
 
     @GetMapping
     public List<Admin> getAllAdmins() {
@@ -34,4 +32,5 @@ public class AdminController {
     public void deleteAdmin(@PathVariable String id) {
         adminService.deleteAdmin(id);
     }
+
 }

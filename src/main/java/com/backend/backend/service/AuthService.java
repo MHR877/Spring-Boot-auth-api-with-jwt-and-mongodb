@@ -15,10 +15,8 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import com.backend.backend.model.Admin;
-import com.backend.backend.model.Club;
 import com.backend.backend.model.User;
 import com.backend.backend.repository.AdminRepository;
-import com.backend.backend.repository.ClubRepository;
 import com.backend.backend.repository.UserRepository;
 import com.backend.backend.service.AuthService.ApiResponse;
 
@@ -33,9 +31,6 @@ public class AuthService {
     private UserRepository userRepository;
 
     @Autowired
-    private ClubRepository clubRepository;
-
-    @Autowired
     private AdminRepository adminRepository;
 
     @Autowired
@@ -44,22 +39,14 @@ public class AuthService {
     @Autowired
     private UserService userService;
 
-    @Autowired
-    private ClubService clubService;
-
     private static final String SECRET_KEY = "my-strong-secret-key-for-jwt";
 
     public ResponseEntity<?> login(String email, String password, HttpServletResponse response) {
         User user = userRepository.findByEmail(email);
-        Club club = clubRepository.findByEmail(email);
         Admin admin = adminRepository.findByEmail(email);
 
         if (user != null && passwordEncoder.matches(password, user.getPassword())) {
             return generateJwtAndSetCookie(user, "ROLE_USER", response);
-        }
-
-        if (club != null && passwordEncoder.matches(password, club.getPassword())) {
-            return generateJwtAndSetCookie(club, "ROLE_CLUB", response);
         }
 
         if (admin != null && passwordEncoder.matches(password, admin.getPassword())) {
@@ -101,8 +88,6 @@ public class AuthService {
         switch (role) {
             case "ROLE_USER":
                 return userRepository.findByEmail(email);
-            case "ROLE_CLUB":
-                return clubRepository.findByEmail(email);
             case "ROLE_ADMIN":
                 return adminRepository.findByEmail(email);
             default:
@@ -113,10 +98,10 @@ public class AuthService {
     private ResponseEntity<?> generateJwtAndSetCookie(Object user, String role, HttpServletResponse response) {
         String jwt = Jwts.builder()
                 .setSubject(role.equals("ROLE_USER") ? ((User) user).getEmail()
-                        : role.equals("ROLE_CLUB") ? ((Club) user).getEmail() : ((Admin) user).getEmail())
+                        : ((Admin) user).getEmail())
                 .claim("role", role)
                 .setIssuedAt(new Date())
-                .setExpiration(new Date(System.currentTimeMillis() + 86400000)) // 24 hours
+                .setExpiration(new Date(System.currentTimeMillis() + 86400000))
                 .signWith(SignatureAlgorithm.HS512, SECRET_KEY)
                 .compact();
 
@@ -127,12 +112,6 @@ public class AuthService {
         response.addCookie(cookie);
 
         return new ResponseEntity<>(new ApiResponse("Successful login as " + role, user), HttpStatus.OK);
-    }
-
-    public ResponseEntity<?> registerClub(Club club) {
-        club.setPassword(passwordEncoder.encode(club.getPassword()));
-        Club savedClub = clubService.createClub(club);
-        return new ResponseEntity<>(new ApiResponse("Club registered successfully", savedClub), HttpStatus.CREATED);
     }
 
     public ResponseEntity<?> registerUser(User user) {

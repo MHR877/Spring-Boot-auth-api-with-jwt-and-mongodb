@@ -9,7 +9,7 @@
     <packaging>jar</packaging>
 
     <name>backend</name>
-    <description>Club Land DZ Backend</description>
+    <description>Backend with spring boot</description>
 
     <parent>
         <groupId>org.springframework.boot</groupId>
